@@ -38,8 +38,8 @@ def handle_split_calculation(ticker, start_date, end_date, price):
         split_date = datetime.strptime(split_date_str, "%d/%m/%Y").date()
         # Only action splits that have occurred within timeframe
         if start_date < split_date < end_date:
-            numerator, denominator = split_ratio
-            adjusted_price *= (float(numerator) / float(denominator))
+            from_quantity, to_quantity = split_ratio
+            adjusted_price *= (float(from_quantity) / float(to_quantity))
     return adjusted_price
 
 
