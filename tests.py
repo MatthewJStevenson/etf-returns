@@ -86,8 +86,8 @@ class TestReturns(unittest.TestCase):
 
         expected = ["2023-12-13", "2023-12-27", "2024-05-30", "2024-06-07", "2024-06-28", "2024-08-15", "2024-08-20"]
         test_list = ["2024/06/07", "2024-05-30", "2024-08-15", "2024/08/20", "2023-12-27", "2023-12-13", "2024-06-28"]
-        #actual = sort_dates(test_list)
-        # self.assertEqual(actual, expected) # Test different date formats, this fails :(
+        actual = sort_dates(test_list)
+        self.assertEqual(actual, expected) # Test different date formats, this fails :(
 
         test_list = ["2024-06-07"]
         expected = ["2024-06-07"]
