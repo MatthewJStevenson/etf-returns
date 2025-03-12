@@ -7,7 +7,7 @@ import sys
 import csv
 from datetime import date, timedelta, datetime
 
-timeframes = {
+TIMEFRAMES = {
     "1 day": 1,
     "5 days": 5,
     "6 months": 182,
@@ -43,10 +43,40 @@ def handle_split_calculation(ticker, start_date, end_date, price):
     return adjusted_price
 
 
+def merge_dates(left, right):
+    sorted_dates = []
+    i = 0
+    j = 0
+    while i < len(left) and j < len(right):
+        left_date = datetime.strptime(left[i], "%Y-%m-%d").date()
+        right_date = datetime.strptime(right[j], "%Y-%m-%d").date()
+        if left_date < right_date:
+            sorted_dates.append(left[i])
+            i += 1
+        else:
+            sorted_dates.append(right[j])
+            j += 1
+
+    sorted_dates.extend(left[i:])
+    sorted_dates.extend(right[j:])
+    return sorted_dates
+
+
+def sort_dates(dates):
+    # Merge sort !
+    if len(dates) <= 1:
+        return dates
+
+    middle = len(dates) // 2
+    left = sort_dates(dates[:middle])
+    right = sort_dates(dates[middle:])
+    
+    return merge_dates(left, right)
+
 def get_last_close_date(ticker, start_date):
     # Dict is aleady sorted from input but sorting for case it isnt
     # Binary search to find it!
-    all_dates = sorted(price_data[ticker].keys())
+    all_dates = sort_dates(list(price_data[ticker].keys()))
     left = 0
     right = len(all_dates) - 1
 
@@ -66,7 +96,7 @@ def get_last_close_date(ticker, start_date):
 
 def get_prices_for_period(ticker, timeframe):
     end_date = date(2024, 12, 31)
-    start_date = end_date - timedelta(days=timeframes[timeframe])
+    start_date = end_date - timedelta(days=TIMEFRAMES[timeframe])
 
     # Handle potential ticker changes
     aka_tickers = []
@@ -87,7 +117,7 @@ def get_prices_for_period(ticker, timeframe):
     end_close_price = float(price_data[ticker][end_date_str])
     start_close_price = float(price_data[ticker][start_date_str])
 
-    # Handle stock split if one has occured during period
+    # Handle split if one has occured during period
     for aka_ticker in aka_tickers:
         if aka_ticker in splits_data:
             start_close_price = handle_split_calculation(aka_ticker, start_date,
@@ -148,7 +178,7 @@ def read_price_input():
 
 
 def valid_arguments(ticker, timeframe):
-    return len(sys.argv) == 3 and ticker in price_data and timeframe in timeframes
+    return len(sys.argv) == 3 and ticker in price_data and timeframe in TIMEFRAMES
 
 
 if __name__ == "__main__":
@@ -169,3 +199,15 @@ if __name__ == "__main__":
     result = calc_price_return(end_price_final, start_price_final)
 
     print(f"{result:.2f}%")
+
+
+def unittest_setup():
+    global price_data
+    global splits_data
+    global ticker_changes_data
+    splits_data = None
+    splits_data = None
+    ticker_changes_data = None
+    price_data = read_price_input()
+    splits_data = read_splits_input()
+    ticker_changes_data = read_ticker_changes_input()
