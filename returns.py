@@ -200,12 +200,12 @@ if __name__ == "__main__":
 
     print(f"{result:.2f}%")
 
-
+# just used for unit testing, wouldnt normally use global like that
 def unittest_setup():
     global price_data
     global splits_data
     global ticker_changes_data
-    splits_data = None
+    price_data = None
     splits_data = None
     ticker_changes_data = None
     price_data = read_price_input()
